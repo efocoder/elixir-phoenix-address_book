@@ -1,6 +1,7 @@
 defmodule AddressBook.Accounts.Account do
   use Ecto.Schema
   import Ecto.Changeset
+  alias AddressBook.Friends.Contact
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -8,6 +9,7 @@ defmodule AddressBook.Accounts.Account do
     field :email, :string
     field :nickname, :string
     field :password, :string
+    has_many :contacts, Contact
 
     timestamps()
   end

@@ -2,20 +2,24 @@ defmodule AddressBookWeb.Router do
   use AddressBookWeb, :router
   use Plug.ErrorHandler
 
-  defp handle_errors(conn, %{reason: %Phoenix.Router.NoRouteError{message: message}}) do
-    conn
-    |> json(%{errors: message})
-    |> halt()
-  end
+  # defp handle_errors(conn, %{reason: %Phoenix.Router.NoRouteError{message: message}}) do
+  #   conn
+  #   |> json(%{errors: message})
+  #   |> halt()
+  # end
 
-  defp handle_errors(conn, %{reason: %{message: message}}) do
-    conn
-    |> json(%{errors: message})
-    |> halt()
-  end
+  # defp handle_errors(conn, %{reason: %{message: message}}) do
+  #   conn
+  #   |> json(%{errors: message})
+  #   |> halt()
+  # end
 
   pipeline :api do
     plug :accepts, ["json"]
+  end
+
+  pipeline :auth do
+    plug AddressBookWeb.Auth.Pipeline
   end
 
   scope "/api", AddressBookWeb do
@@ -24,6 +28,14 @@ defmodule AddressBookWeb.Router do
     scope "/v1", V1, as: :v1 do
       post "/accounts/sign_up", AccountController, :sign_up
       post "/accounts/sign_in", AccountController, :sign_in
+    end
+  end
+
+  scope "/api", AddressBookWeb do
+    pipe_through [:api, :auth]
+
+    scope "/v1", V1, as: :v1 do
+      resources "/contacts", ContactController, except: [:new, :edit]
     end
   end
 
